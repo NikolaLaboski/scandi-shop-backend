@@ -9,22 +9,26 @@ class ProductResolver
 {
     /**
      * Create a new PDO connection to the webshop database.
-     * In production, move DSN/credentials to env vars and set PDO attributes (ERRMODE, etc.).
+     * Reads DSN/credentials from ENV in production, falls back to local defaults.
      *
      * @return \PDO
      */
     private static function connect()
     {
-        return new PDO('mysql:host=localhost;dbname=webshop', 'root', '');
+        $host = getenv('MYSQLHOST') ?: 'localhost';
+        $db   = getenv('MYSQLDATABASE') ?: 'webshop';
+        $user = getenv('MYSQLUSER') ?: 'root';
+        $pass = getenv('MYSQLPASSWORD') ?: '';
+        $port = getenv('MYSQLPORT') ?: '3306';
+
+        $dsn = "mysql:host={$host};port={$port};dbname={$db};charset=utf8mb4";
+        $pdo = new PDO($dsn, $user, $pass, [
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+        ]);
+        return $pdo;
     }
 
-    /**
-     * Read ordered gallery URLs for a product from product_images.
-     * Falls back to an empty array if none are found.
-     *
-     * @param int|string $productId
-     * @return array<int, string>
-     */
     private static function getGalleryForProduct($productId)
     {
         $db = self::connect();
@@ -34,18 +38,6 @@ class ProductResolver
         return $rows ?: [];
     }
 
-    /**
-     * Fetch and enrich all products:
-     *  - attributes via AttributeResolver
-     *  - prices array
-     *  - inStock cast to boolean
-     *  - gallery normalized (product_images first, else products.image fallback)
-     *  - price convenience field from prices[0].amount (if present)
-     *
-     * On per-product error, logs and supplies safe defaults.
-     *
-     * @return array<int, array<string, mixed>>
-     */
     public static function getAllProducts()
     {
         $db = self::connect();
@@ -54,28 +46,20 @@ class ProductResolver
 
         foreach ($products as &$product) {
             try {
-                // Attributes (with items)
                 $product['attributes'] = AttributeResolver::getAttributesForProduct($product['id']);
-
-                // Prices (amount + currency fields)
                 $product['prices'] = self::getPricesForProduct($product['id']);
-
-                // Normalize boolean field
                 $product['inStock'] = (bool)$product['inStock'];
 
-                // Gallery: prefer product_images; fallback to legacy products.image
                 $gallery = self::getGalleryForProduct($product['id']);
                 if (empty($gallery) && !empty($product['image'])) {
                     $gallery = [$product['image']];
                 }
                 $product['gallery'] = $gallery;
 
-                // Convenience scalar price (first amount if available)
                 $product['price'] = isset($product['prices'][0]['amount'])
                     ? (float)$product['prices'][0]['amount'] : null;
 
             } catch (\Throwable $e) {
-                // Fail soft for this product, keep the list response intact.
                 $product['attributes'] = [];
                 $product['prices'] = [];
                 $product['gallery'] = [];
@@ -89,12 +73,6 @@ class ProductResolver
         return $products;
     }
 
-    /**
-     * Fetch a single product by ID and enrich it (same as in getAllProducts()).
-     *
-     * @param int|string $id
-     * @return array<string, mixed>|false associative array or false if not found
-     */
     public static function getProductById($id)
     {
         $db = self::connect();
@@ -108,7 +86,6 @@ class ProductResolver
                 $product['prices'] = self::getPricesForProduct($product['id']);
                 $product['inStock'] = (bool)$product['inStock'];
 
-                // 🔥 ГАЛЕРИЈА: прво од product_images, ако нема -> products.image
                 $gallery = self::getGalleryForProduct($product['id']);
                 if (empty($gallery) && !empty($product['image'])) {
                     $gallery = [$product['image']];
@@ -119,7 +96,6 @@ class ProductResolver
                     ? (float)$product['prices'][0]['amount'] : null;
 
             } catch (\Throwable $e) {
-                // If enrichment fails, return minimal safe structure and log.
                 $product['attributes'] = [];
                 $product['prices'] = [];
                 $product['gallery'] = [];
@@ -133,13 +109,6 @@ class ProductResolver
         return $product;
     }
 
-    /**
-     * Get prices for a product as an array of rows:
-     *  [ ['amount'=>float, 'currency_label'=>string, 'currency_symbol'=>string], ... ]
-     *
-     * @param int|string $productId
-     * @return array<int, array<string, mixed>>
-     */
     private static function getPricesForProduct($productId)
     {
         $db = self::connect();

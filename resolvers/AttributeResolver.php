@@ -10,13 +10,24 @@ class AttributeResolver
 {
     /**
      * Create a new PDO connection to the webshop database.
-     * Consider moving DSN/credentials to environment variables in production.
+     * Reads DSN/credentials from ENV in production, falls back to local defaults.
      *
      * @return \PDO
      */
     private static function connect()
     {
-        return new PDO('mysql:host=localhost;dbname=webshop', 'root', '');
+        $host = getenv('MYSQLHOST') ?: 'localhost';
+        $db   = getenv('MYSQLDATABASE') ?: 'webshop';
+        $user = getenv('MYSQLUSER') ?: 'root';
+        $pass = getenv('MYSQLPASSWORD') ?: '';
+        $port = getenv('MYSQLPORT') ?: '3306';
+
+        $dsn = "mysql:host={$host};port={$port};dbname={$db};charset=utf8mb4";
+        $pdo = new PDO($dsn, $user, $pass, [
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+        ]);
+        return $pdo;
     }
 
     /**
