@@ -1,0 +1,157 @@
+[DEBUG] Product fields loading...
+[2025-08-08 14:47:31] getAttributeType() called
+[2025-08-08 14:47:31] attribute fields loaded
+[DEBUG] Product fields loading...
+[2025-08-08 15:07:28] getAttributeType() called
+[2025-08-08 15:07:28] attribute fields loaded
+[2025-08-08 15:07:33] Product ID: 1 resolved
+Attributes: [{"id":1,"name":"Size","value":"M"},{"id":2,"name":"Color","value":"Red"}]
+[DEBUG] Resolving attributes field in ProductType
+[DEBUG] Product fields loading...
+[2025-08-08 15:10:36] getAttributeType() called
+[2025-08-08 15:10:36] attribute fields loaded
+[2025-08-08 15:10:37] Product ID: 1 resolved
+Attributes: [{"id":1,"name":"Size","value":"M"},{"id":2,"name":"Color","value":"Red"}]
+[DEBUG] Resolving attributes field in ProductType
+[DEBUG] Product fields loading...
+[2025-08-08 15:16:51] getAttributeType() called
+[2025-08-08 15:16:51] attribute fields loaded
+[2025-08-08 15:16:51] Product ID: 1 resolved
+Attributes: [{"id":1,"name":"Size","value":"M"},{"id":2,"name":"Color","value":"Red"}]
+[DEBUG] Resolving attributes field in ProductType
+[DEBUG] Product fields loading...
+[2025-08-08 15:20:20] getAttributeType() called
+[2025-08-08 15:20:20] attribute fields loaded
+[DEBUG] Product fields loading...
+[2025-08-08 15:20:31] getAttributeType() called
+[2025-08-08 15:20:31] attribute fields loaded
+[DEBUG] Product fields loading...
+[2025-08-08 16:42:04] getAttributeType() called
+[2025-08-08 16:42:04] attribute fields loaded
+[2025-08-08 16:42:11] Product ID: 1 resolved
+Attributes: [{"id":1,"name":"Size","value":"M"},{"id":2,"name":"Color","value":"Red"}]
+[DEBUG] Resolving attributes field in ProductType
+[DEBUG] Product fields loading...
+[2025-08-08 17:02:38] getAttributeType() called
+[2025-08-08 17:02:38] attribute fields loaded
+[DEBUG] Product fields loading...
+[2025-08-08 17:03:04] getAttributeType() called
+[2025-08-08 17:03:04] attribute fields loaded
+[2025-08-08 17:03:04] Product ID: 1 resolved
+Attributes: [{"id":1,"name":"Size","value":"M"},{"id":2,"name":"Color","value":"Red"}]
+[DEBUG] Resolving attributes field in ProductType
+[DEBUG] Product fields loading...
+[2025-08-08 17:03:46] getAttributeType() called
+[2025-08-08 17:03:46] attribute fields loaded
+[2025-08-08 17:03:46] Product ID: 1 resolved
+Attributes: [{"id":1,"name":"Size","value":"M"},{"id":2,"name":"Color","value":"Red"}]
+[DEBUG] Resolving attributes field in ProductType
+[DEBUG] Product fields loading...
+[2025-08-08 17:29:14] getAttributeType() called
+[2025-08-08 17:29:14] attribute fields loaded
+[2025-08-08 17:29:14] Product ID: 2 resolved
+Attributes: []
+[2025-08-08 17:29:14] Product ID: 3 resolved
+Attributes: []
+[2025-08-08 17:29:14] Product ID: 4 resolved
+Attributes: []
+[2025-08-08 17:29:14] Product ID: 5 resolved
+Attributes: []
+[2025-08-08 17:29:14] Product ID: 6 resolved
+Attributes: []
+[2025-08-08 17:29:14] Product ID: 7 resolved
+Attributes: []
+[2025-08-08 17:29:14] Product ID: 8 resolved
+Attributes: []
+[2025-08-08 17:29:14] Product ID: 9 resolved
+Attributes: []
+[DEBUG] Resolving attributes field in ProductType
+[DEBUG] Resolving attributes field in ProductType
+[DEBUG] Resolving attributes field in ProductType
+[DEBUG] Resolving attributes field in ProductType
+[DEBUG] Resolving attributes field in ProductType
+[DEBUG] Resolving attributes field in ProductType
+[DEBUG] Resolving attributes field in ProductType
+[DEBUG] Resolving attributes field in ProductType
+[DEBUG] Product fields loading...
+[2025-08-08 17:52:22] getAttributeType() called
+[2025-08-08 17:52:22] attribute fields loaded
+[2025-08-08 17:52:28] Product ID: 2 resolved
+Attributes: []
+[2025-08-08 17:52:28] Product ID: 3 resolved
+Attributes: []
+[2025-08-08 17:52:28] Product ID: 4 resolved
+Attributes: []
+[2025-08-08 17:52:28] Product ID: 5 resolved
+Attributes: []
+[2025-08-08 17:52:28] Product ID: 6 resolved
+Attributes: []
+[2025-08-08 17:52:28] Product ID: 7 resolved
+Attributes: []
+[2025-08-08 17:52:28] Product ID: 8 resolved
+Attributes: []
+[2025-08-08 17:52:28] Product ID: 9 resolved
+Attributes: []
+[DEBUG] Resolving attributes field in ProductType
+[DEBUG] Resolving attributes field in ProductType
+[DEBUG] Resolving attributes field in ProductType
+[DEBUG] Resolving attributes field in ProductType
+[DEBUG] Resolving attributes field in ProductType
+[DEBUG] Resolving attributes field in ProductType
+[DEBUG] Resolving attributes field in ProductType
+[DEBUG] Resolving attributes field in ProductType
+[DEBUG] Product fields loading...
+[2025-08-08 17:53:20] getAttributeType() called
+[2025-08-08 17:53:20] attribute fields loaded
+[2025-08-08 17:53:21] Product ID: 2 resolved
+Attributes: []
+[2025-08-08 17:53:21] Product ID: 3 resolved
+Attributes: []
+[2025-08-08 17:53:21] Product ID: 4 resolved
+Attributes: []
+[2025-08-08 17:53:21] Product ID: 5 resolved
+Attributes: []
+[2025-08-08 17:53:21] Product ID: 6 resolved
+Attributes: []
+[2025-08-08 17:53:21] Product ID: 7 resolved
+Attributes: []
+[2025-08-08 17:53:21] Product ID: 8 resolved
+Attributes: []
+[2025-08-08 17:53:21] Product ID: 9 resolved
+Attributes: []
+[DEBUG] Resolving attributes field in ProductType
+[DEBUG] Resolving attributes field in ProductType
+[DEBUG] Resolving attributes field in ProductType
+[DEBUG] Resolving attributes field in ProductType
+[DEBUG] Resolving attributes field in ProductType
+[DEBUG] Resolving attributes field in ProductType
+[DEBUG] Resolving attributes field in ProductType
+[DEBUG] Resolving attributes field in ProductType
+[DEBUG] Product fields loading...
+[2025-08-08 19:03:55] getAttributeType() called
+[2025-08-08 19:03:55] attribute fields loaded
+[DEBUG] Product fields loading...
+[2025-08-08 19:42:19] getAttributeType() called
+[2025-08-08 19:42:19] attribute fields loaded
+[2025-08-08 19:42:19] Product ID: apple-airpods-pro resolved
+Attributes: []
+[2025-08-08 19:42:19] Product ID: apple-airtag resolved
+Attributes: []
+[2025-08-08 19:42:19] Product ID: apple-imac-2021 resolved
+Attributes: []
+[2025-08-08 19:42:19] Product ID: apple-iphone-12-pro resolved
+Attributes: []
+[2025-08-08 19:42:19] Product ID: huarache-x-stussy-le resolved
+Attributes: []
+[2025-08-08 19:42:19] Product ID: jacket-canada-goosee resolved
+Attributes: []
+[2025-08-08 19:42:19] Product ID: ps-5 resolved
+Attributes: []
+[2025-08-08 19:42:19] Product ID: xbox-series-s resolved
+Attributes: []
+[DEBUG] Product fields loading...
+[2025-08-08 20:04:18] getAttributeType() called
+[2025-08-08 20:04:18] attribute fields loaded
+[DEBUG] Product fields loading...
+[2025-08-08 20:04:21] getAttributeType() called
+[2025-08-08 20:04:21] attribute fields loaded
