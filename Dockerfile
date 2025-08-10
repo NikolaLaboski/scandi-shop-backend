@@ -26,8 +26,12 @@ ENV APACHE_DOCUMENT_ROOT=/var/www/html/graphql
 RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf \
     && sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
 
-# Expose (Railway injects $PORT; we remap Apache to it in CMD)
+# Copy entrypoint and make it executable
+COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+
+# Expose (Railway will inject $PORT; entrypoint binds Apache to it)
 EXPOSE 80
 
-# Bind Apache to $PORT provided by Railway, then start in foreground
-CMD ["/bin/sh","-lc",": ${PORT:=80}; sed -ri \"s/Listen 80/Listen ${PORT}/\" /etc/apache2/ports.conf; sed -ri \"s/:80>/:${PORT}>/g\" /etc/apache2/sites-available/000-default.conf; exec apache2-foreground"]
+# Start via entrypoint (binds Apache to $PORT)
+CMD ["/usr/local/bin/docker-entrypoint.sh"]
