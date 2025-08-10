@@ -1,76 +1,88 @@
 <?php
-// index.php
-// Front controller for the GraphQL endpoint.
-// Responsibilities:
-// - Basic error reporting (dev-friendly).
-// - CORS preflight handling for browsers.
-// - Bootstrap Composer autoload + schema wiring.
-// - Execute GraphQL queries and return JSON responses.
+// graphql/index.php
 
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
+declare(strict_types=1);
+
+use GraphQL\GraphQL;
+use GraphQL\Error\DebugFlag;
+
+ini_set('display_errors', '0');
 error_reporting(E_ALL);
 
-// CORS: allow requests from any origin and common headers/methods.
-// NOTE: For production, consider restricting Access-Control-Allow-Origin to your frontend domain.
-header("Access-Control-Allow-Origin: *");
-header("Access-Control-Allow-Headers: Content-Type, Authorization");
-header("Access-Control-Allow-Methods: POST, OPTIONS");
+// CORS (adjust origin if needed)
+header('Access-Control-Allow-Origin: *');
+header('Access-Control-Allow-Methods: GET, POST, OPTIONS');
+header('Access-Control-Allow-Headers: Content-Type, Authorization');
 
-// Handle preflight requests early (no body expected).
-if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'OPTIONS') {
     http_response_code(204);
     exit;
 }
 
-require_once __DIR__ . '/../vendor/autoload.php';
+// If vendor autoload exists, include it
+$autoload = __DIR__ . '/../vendor/autoload.php';
+if (file_exists($autoload)) {
+    require_once $autoload;
+}
 
-use GraphQL\GraphQL;
-
-// Load types/resolvers/mutations used by the schema factory.
-// NOTE: These includes register type definitions and resolvers in memory.
-require_once __DIR__ . '/../schemas/ProductSchema.php';
-require_once __DIR__ . '/../schemas/AttributeSchema.php';
-require_once __DIR__ . '/../resolvers/ProductResolver.php';
-require_once __DIR__ . '/../resolvers/AttributeResolver.php';
-require_once __DIR__ . '/../mutations/CreateOrderMutation.php';
-
-// Build the executable schema (query + mutation root objects).
+// Build schema
 $schema = require __DIR__ . '/schema.php';
 
-try {
-    // Read raw JSON body from the request.
-    $rawInput = file_get_contents('php://input');
-    $input = json_decode($rawInput, true);
+// Accept both GET (simple health) and POST (GraphQL)
+$method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
 
-    // Minimal validation: ensure a GraphQL query exists.
-    if (!isset($input['query'])) {
-        throw new \Exception("No GraphQL query provided.");
-    }
-
-    $query = $input['query'];
-    $variableValues = $input['variables'] ?? null;
-
-    // Execute the GraphQL operation.
-    //  - $rootValue = null (not used here)
-    //  - $context = null (could pass DB, auth, etc., if needed)
-    $result = GraphQL::executeQuery($schema, $query, null, null, $variableValues);
-    $output = $result->toArray();
-} catch (\Throwable $e) {
-    // On any unhandled exception, return HTTP 500 with a JSON error payload.
-    // NOTE: Be careful exposing file/line in production (can leak internals).
-    http_response_code(500);
-    header('Content-Type: application/json');
-    echo json_encode([
-        'errors' => [[
-            'message' => $e->getMessage(),
-            'file' => $e->getFile(),
-            'line' => $e->getLine()
-        ]]
-    ]);
+if ($method === 'GET') {
+    header('Content-Type: text/plain; charset=utf-8');
+    echo "GraphQL endpoint ready. Use POST with JSON body to query.\n";
     exit;
 }
 
-// Success: return the GraphQL execution result as JSON.
-header('Content-Type: application/json');
-echo json_encode($output);
+if ($method !== 'POST') {
+    http_response_code(405);
+    header('Allow: GET, POST, OPTIONS');
+    header('Content-Type: application/json; charset=utf-8');
+    echo json_encode(['error' => 'Method Not Allowed']);
+    exit;
+}
+
+// Read and decode JSON input
+$raw = file_get_contents('php://input') ?: '';
+$input = json_decode($raw, true);
+
+$query     = $input['query']     ?? '';
+$variables = $input['variables'] ?? null;
+$operation = $input['operationName'] ?? null;
+
+if (!is_string($query) || $query === '') {
+    http_response_code(400);
+    header('Content-Type: application/json; charset=utf-8');
+    echo json_encode(['error' => 'Missing or invalid GraphQL query']);
+    exit;
+}
+
+try {
+    $result = GraphQL::executeQuery(
+        $schema,
+        $query,
+        null,     // rootValue
+        null,     // context
+        is_array($variables) ? $variables : null,
+        is_string($operation) ? $operation : null
+    );
+
+    // DEBUG ENABLED
+    $debugFlags = DebugFlag::INCLUDE_DEBUG_MESSAGE | DebugFlag::INCLUDE_TRACE;
+
+    $output = $result->toArray($debugFlags);
+    header('Content-Type: application/json; charset=utf-8');
+    echo json_encode($output);
+} catch (Throwable $e) {
+    header('Content-Type: application/json; charset=utf-8', true, 500);
+    echo json_encode([
+        'errors' => [[
+            'message' => 'Internal server error',
+            'debugMessage' => $e->getMessage(),
+            'trace' => $e->getTraceAsString(),
+        ]],
+    ]);
+}
