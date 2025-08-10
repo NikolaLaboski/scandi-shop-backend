@@ -1,31 +1,34 @@
 <?php
-// db_test.php
+declare(strict_types=1);
 
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
+header('Content-Type: text/plain; charset=utf-8');
+
+$host = getenv('MYSQLHOST') ?: '';
+$db   = getenv('MYSQLDATABASE') ?: '';
+$user = getenv('MYSQLUSER') ?: '';
+$pass = getenv('MYSQLPASSWORD') ?: '';
+$port = getenv('MYSQLPORT') ?: '';
+
+echo "ENV check:\n";
+echo "HOST={$host}\nDB={$db}\nUSER={$user}\nPORT={$port}\n";
+
+if ($host === '' || $db === '' || $user === '' || $port === '') {
+    http_response_code(500);
+    echo "❌ Missing one or more MYSQL* env vars.\n";
+    exit;
+}
+
+$dsn = "mysql:host={$host};port={$port};dbname={$db};charset=utf8mb4";
+echo "DSN={$dsn}\n";
 
 try {
-    $pdo = new PDO('mysql:host=localhost;dbname=webshop', 'root', '');
-    echo "✅ Connected to DB<br><br>";
-
-    $productId = 1;
-
-    $stmt = $pdo->prepare("
-        SELECT a.id, a.name, ai.value
-        FROM product_attributes pa
-        JOIN attributes a ON a.id = pa.attribute_id
-        JOIN attribute_items ai ON ai.attribute_id = a.id AND ai.product_id = pa.product_id
-        WHERE pa.product_id = ?
-    ");
-    $stmt->execute([$productId]);
-
-    $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-    echo "<pre>";
-    print_r($results);
-    echo "</pre>";
-
-} catch (PDOException $e) {
-    echo "❌ DB Error: " . $e->getMessage();
+    $pdo = new PDO($dsn, $user, $pass, [
+        PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
+        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+    ]);
+    $pdo->query("SELECT 1")->fetch();
+    echo "✅ DB OK\n";
+} catch (Throwable $e) {
+    http_response_code(500);
+    echo "❌ DB Error: " . $e->getMessage() . "\n";
 }
