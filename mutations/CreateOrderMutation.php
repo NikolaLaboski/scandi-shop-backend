@@ -2,18 +2,34 @@
 // CreateOrderMutation.php
 // Example mutation to create an order and associated order items.
 
+use GraphQL\Type\Definition\Type;
+
 class CreateOrderMutation
 {
-    public static function getDefinition()
+    
+    public static function getMutation(): array
     {
         return [
-            'type' => Type::boolean(),
+            'createOrder' => self::getDefinition()
+        ];
+    }
+
+    public static function getDefinition(): array
+    {
+        return [
+            
+            'type' => Type::nonNull(Type::boolean()),
             'args' => [
                 'items' => [
-                    'type' => Type::nonNull(Type::listOf(OrderInputSchema::getOrderItemInputType()))
+                    'type' => Type::nonNull(
+                        Type::listOf(
+                          
+                            OrderInputSchema::getOrderItemInputType()
+                        )
+                    )
                 ],
-                'customerName' => Type::string(),
-                'address' => Type::string(),
+                'customerName' => ['type' => Type::string()],
+                'address'      => ['type' => Type::string()],
             ],
             'resolve' => function ($root, $args) {
                 try {
@@ -28,11 +44,12 @@ class CreateOrderMutation
                         PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
                     ]);
 
-                    // ... остатокот од кодот за внес на order и order_items ...
+                   
 
                     return true;
                 } catch (\Throwable $e) {
-                    file_put_contents(__DIR__ . '/../error_log.txt',
+                    @file_put_contents(
+                        __DIR__ . '/../error_log.txt',
                         "[ERROR] CreateOrder: {$e->getMessage()}\n",
                         FILE_APPEND
                     );
