@@ -70,8 +70,8 @@ try {
         is_string($operation) ? $operation : null
     );
 
-    // DEBUG ENABLED
-    $debugFlags = DebugFlag::INCLUDE_DEBUG_MESSAGE | DebugFlag::INCLUDE_TRACE;
+    // DEBUG DISABLED
+    $debugFlags = 0;
 
     $output = $result->toArray($debugFlags);
     header('Content-Type: application/json; charset=utf-8');
@@ -80,9 +80,7 @@ try {
     header('Content-Type: application/json; charset=utf-8', true, 500);
     echo json_encode([
         'errors' => [[
-            'message' => 'Internal server error',
-            'debugMessage' => $e->getMessage(),
-            'trace' => $e->getTraceAsString(),
+            'message' => 'Internal server error'
         ]],
     ]);
 }
