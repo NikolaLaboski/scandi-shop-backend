@@ -1,15 +1,9 @@
-# PHP 8.3 + Apache
-FROM php:8.3-apache
+# ---------- Single-file Dockerfile (PHP built-in server + router) ----------
+FROM php:8.3-cli
 
 
-RUN docker-php-ext-install pdo pdo_mysql
-
-
-RUN a2enmod rewrite
-
-
-WORKDIR /var/www/html
-COPY . /var/www/html
+WORKDIR /app
+COPY . /app
 
 
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
@@ -18,41 +12,44 @@ RUN if [ -f composer.json ]; then \
     fi
 
 
-RUN set -e; cat >/entrypoint.sh <<'EOF'
-#!/usr/bin/env sh
-set -e
-
-PORT="${PORT:-8080}"
+RUN set -e; cat > /app/router.php <<'PHP'
+<?php
+$path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 
 
-if grep -qE '^Listen 80' /etc/apache2/ports.conf; then
-  sed -i "s/^Listen 80/Listen ${PORT}/" /etc/apache2/ports.conf
-else
-  echo "Listen ${PORT}" >> /etc/apache2/ports.conf
-fi
+$allowed = ['https://scweb-shop.netlify.app', 'http://localhost:5173'];
+$origin  = $_SERVER['HTTP_ORIGIN'] ?? '';
+if ($path === '/graphql' || $path === '/graphql/') {
+  if (in_array($origin, $allowed, true)) {
+    header("Access-Control-Allow-Origin: $origin");
+    header("Vary: Origin");
+    header("Access-Control-Allow-Credentials: true");
+  }
+  header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
+  header("Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With, Apollo-Require-Preflight");
+
+  if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'OPTIONS') {
+    http_response_code(204);
+    exit;
+  }
+}
 
 
-sed -i "s#<VirtualHost \*:80>#<VirtualHost *:${PORT}>#g" /etc/apache2/sites-available/000-default.conf
-sed -i "s#DocumentRoot .*#DocumentRoot /var/www/html#g" /etc/apache2/sites-available/000-default.conf
+if ($path === '/graphql' || $path === '/graphql/') {
+  require __DIR__ . '/graphql/index.php';
+  exit;
+}
 
 
-cat >/etc/apache2/conf-available/graphql.conf <<'EOC'
-<Directory "/var/www/html/graphql">
-  DirectorySlash Off
-  DirectoryIndex index.php
-  Options Indexes FollowSymLinks
-  AllowOverride All
-  Require all granted
-</Directory>
-EOC
-
-a2enconf graphql || true
-a2enmod rewrite || true
+if ($path !== '/' && file_exists(__DIR__.$path) && !is_dir(__DIR__.$path)) {
+  return false; // php -S ќе го сервира
+}
 
 
-exec apache2-foreground
-EOF
-RUN chmod +x /entrypoint.sh
+header('Content-Type: text/plain; charset=utf-8');
+echo "Backend root. GraphQL is at /graphql\n";
+PHP
+
 
 EXPOSE 8080
-ENTRYPOINT ["/entrypoint.sh"]
+CMD ["sh", "-lc", "php -S 0.0.0.0:${PORT:-8080} router.php"]
